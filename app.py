@@ -71,7 +71,8 @@ def check_emails(emails, platform="codex", start_date=None, end_date=None):
         "JSON_VALID(additional)",
         f"LOWER(JSON_UNQUOTE(JSON_EXTRACT(additional, '$.email'))) IN ({placeholders})",
     ]
-    params = [platform]
+    # SQL 条件中的参数顺序是：platform、邮箱列表、开始日期、结束日期。
+    params = [platform, *emails]
     if start_date:
         conditions.append("created_at >= %s")
         params.append(start_date)
@@ -86,7 +87,7 @@ def check_emails(emails, platform="codex", start_date=None, end_date=None):
     connection = get_db_connection()
     try:
         with connection.cursor() as cursor:
-            cursor.execute(sql, [*params, *emails])
+            cursor.execute(sql, params)
             return {row["email"] for row in cursor.fetchall() if row.get("email")}
     finally:
         connection.close()
