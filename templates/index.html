@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>邮箱账号检查</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Noto+Sans+SC:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root { --bg:#0c111c; --panel:#131b2a; --panel-2:#182338; --line:#29364c; --text:#edf3ff; --muted:#9aa9c0; --accent:#6ee7c3; --accent-2:#54b8ff; --danger:#ff8e9f; }
+    * { box-sizing:border-box; }
+    body { margin:0; min-height:100vh; background:radial-gradient(circle at 15% 10%,#173250 0,transparent 34%),radial-gradient(circle at 90% 15%,#1b3144 0,transparent 28%),var(--bg); color:var(--text); font-family:'DM Sans','Noto Sans SC',sans-serif; }
+    main { width:min(980px,calc(100% - 32px)); margin:0 auto; padding:64px 0 52px; }
+    .eyebrow { color:var(--accent); text-transform:uppercase; letter-spacing:.18em; font-size:12px; font-weight:700; }
+    h1 { margin:12px 0 8px; font-size:clamp(34px,6vw,58px); line-height:1.05; letter-spacing:-.04em; }
+    .intro { color:var(--muted); font-size:16px; margin:0 0 32px; max-width:600px; line-height:1.65; }
+    .card { background:linear-gradient(145deg,rgba(24,35,56,.95),rgba(15,23,37,.96)); border:1px solid var(--line); border-radius:22px; box-shadow:0 24px 80px rgba(0,0,0,.28); overflow:hidden; }
+    .card-top { padding:24px 24px 20px; border-bottom:1px solid var(--line); display:flex; justify-content:space-between; gap:20px; align-items:center; }
+    .form-grid { display:grid; grid-template-columns:minmax(0,1fr) 180px 180px 180px; gap:14px; align-items:end; }
+    .field-label { display:block; font-size:13px; font-weight:600; margin-bottom:8px; }
+    .platform-input, .date-input { width:100%; min-height:46px; border:1px solid var(--line); border-radius:12px; outline:0; padding:0 14px; background:#0f1725; color:var(--text); font:500 15px inherit; }
+    .platform-input:focus, .date-input:focus { border-color:var(--accent); box-shadow:0 0 0 3px rgba(110,231,195,.12); }
+    .label { font-size:14px; font-weight:600; }
+    .hint { color:var(--muted); font-size:13px; margin-top:5px; }
+    textarea { display:block; width:100%; min-height:260px; resize:vertical; border:0; outline:0; padding:22px 24px; background:#0f1725; color:var(--text); font:500 16px/1.7 'DM Sans','Noto Sans SC',sans-serif; }
+    textarea:focus { box-shadow:inset 0 0 0 2px rgba(110,231,195,.45); }
+    .actions { display:flex; justify-content:flex-end; gap:12px; padding:18px 24px 24px; }
+    button { min-height:46px; padding:0 20px; border-radius:12px; border:1px solid transparent; color:var(--text); background:#23314a; font:600 14px inherit; cursor:pointer; transition:transform .18s ease,background .18s ease,opacity .18s ease; }
+    button:hover { transform:translateY(-1px); background:#2b3b59; } button:disabled { opacity:.55; cursor:wait; transform:none; }
+    .primary { background:linear-gradient(135deg,var(--accent),#7ae0ff); color:#09202a; } .primary:hover { background:linear-gradient(135deg,#85f1d0,#8ce4ff); }
+    .result { display:none; margin-top:22px; } .result.show { display:block; animation:rise .25s ease-out; }
+    @keyframes rise { from {opacity:0; transform:translateY(8px)} to {opacity:1; transform:none} }
+    .status { padding:22px 24px; display:flex; align-items:center; gap:14px; } .status-icon { width:38px;height:38px;border-radius:50%; display:grid;place-items:center; font-size:20px; background:rgba(110,231,195,.14); color:var(--accent); } .status.error .status-icon { background:rgba(255,142,159,.15); color:var(--danger); }
+    .status strong { display:block; font-size:17px; } .status p { margin:4px 0 0; color:var(--muted); font-size:14px; }
+    .missing { border-top:1px solid var(--line); padding:20px 24px 24px; } .missing h2 { font-size:14px; margin:0 0 12px; } .missing pre { margin:0; padding:16px; max-height:230px; overflow:auto; border-radius:12px; background:#0d1522; color:#b9f7e4; font:14px/1.7 ui-monospace,SFMono-Regular,Menlo,monospace; white-space:pre-wrap; word-break:break-word; }
+    .meta { display:flex; gap:18px; flex-wrap:wrap; color:var(--muted); font-size:13px; margin-top:16px; } .meta b { color:var(--text); } .invalid { color:var(--danger); }
+    footer { color:#718098; font-size:12px; margin-top:18px; text-align:center; } code { color:#c5d4ea; }
+    @media (max-width:980px) { .form-grid { grid-template-columns:minmax(0,1fr) 160px 160px 160px; } }
+    @media (max-width:700px) { .form-grid { grid-template-columns:1fr 1fr; } .form-grid > :first-child { grid-column:1 / -1; } }
+    @media (max-width:560px) { main { padding-top:38px; } .card-top { align-items:flex-start; flex-direction:column; } .actions { flex-direction:column-reverse; } button { width:100%; } textarea { min-height:220px; } }
+    @media (prefers-reduced-motion:reduce) { *,*:before,*:after { animation-duration:.01ms!important; transition-duration:.01ms!important; } }
+  </style>
+</head>
+<body>
+  <main>
+    <div class="eyebrow">FOAI TOKENS · ACCOUNT CHECK</div>
+    <h1>检查邮箱是否已入库</h1>
+    <p class="intro">粘贴一批邮箱地址，系统会查询 <code>foai_tokens.additional.email</code>。只会导出数据库中不存在的邮箱。</p>
+    <section class="card" aria-labelledby="input-label">
+      <div class="card-top"><div class="form-grid" style="width:100%"><div><div id="input-label" class="label">邮箱列表</div><div class="hint">支持换行、空格、逗号或分号分隔，每行一个更清晰</div></div><label><span class="field-label">Platform</span><input id="platform" class="platform-input" type="text" value="codex" maxlength="256" autocomplete="off" aria-label="Platform 值"></label><label><span class="field-label">开始日期</span><input id="start-date" class="date-input" type="date" aria-label="开始日期"></label><label><span class="field-label">结束日期 <small style="color:var(--muted);font-weight:400">可选</small></span><input id="end-date" class="date-input" type="date" aria-label="结束日期"></label></div><div id="count" class="hint">0 个地址</div></div>
+      <textarea id="emails" aria-label="邮箱列表" placeholder="jolie_etgev@mail.com\nabigale_laborumer@mail.com\nmohammed_omniszsd@mail.com"></textarea>
+      <div class="actions"><button id="clear" type="button">清空</button><button id="check" class="primary" type="button">检查邮箱 <span aria-hidden="true">→</span></button></div>
+    </section>
+    <section id="result" class="card result" aria-live="polite"></section>
+    <footer>数据库连接通过环境变量配置 · 不会在页面展示 token 内容</footer>
+  </main>
+  <script>
+    const input = document.querySelector('#emails'), count = document.querySelector('#count'), check = document.querySelector('#check'), clear = document.querySelector('#clear'), result = document.querySelector('#result');
+    const startDate = document.querySelector('#start-date'), endDate = document.querySelector('#end-date');
+    const defaultStart = new Date(); defaultStart.setDate(defaultStart.getDate() - 7); startDate.value = defaultStart.toISOString().slice(0, 10);
+    let missing = [];
+    function updateCount(){ const values = input.value.split(/[\s,;]+/).filter(Boolean); count.textContent = `${values.length} 个地址`; }
+    input.addEventListener('input', updateCount); clear.addEventListener('click',()=>{input.value=''; updateCount(); result.classList.remove('show'); result.innerHTML=''; input.focus();});
+    const escapeHtml = (value) => String(value).replace(/[&<>\"']/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','\"':'&quot;',"'":'&#39;'}[ch]));
+    check.addEventListener('click', async()=>{
+      if(!input.value.trim()){ result.innerHTML='<div class="status error"><div class="status-icon">!</div><div><strong>请先粘贴邮箱</strong><p>输入至少一个邮箱后再检查。</p></div></div>'; result.classList.add('show'); return; }
+      check.disabled=true; check.textContent='检查中…'; result.classList.remove('show');
+      try { const response=await fetch('/api/check',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({emails:input.value, platform:document.querySelector('#platform').value, start_date:startDate.value, end_date:endDate.value})}); const data=await response.json(); if(!response.ok) throw new Error(data.error||'请求失败'); missing=data.missing||[];
+        const allThere=missing.length===0; const dateLabel = data.start_date ? `${data.start_date} 至 ${data.end_date || '现在'}` : '不限'; result.innerHTML=`<div class="status ${allThere?'':'error'}"><div class="status-icon">${allThere?'✓':'!'}</div><div><strong>${allThere?'数据库中都有':'发现数据库中不存在的邮箱'}</strong><p>${allThere?'本次提交的邮箱均已存在。':'请下载下方列表，进行后续处理。'}</p></div></div><div class="missing"><div class="meta"><span>平台 <b>${escapeHtml(data.platform)}</b></span><span>时间范围 <b>${escapeHtml(dateLabel)}</b></span><span>输入 <b>${data.total}</b></span><span>已存在 <b>${data.found_count}</b></span><span>不存在 <b>${data.missing_count}</b></span>${data.invalid?.length?`<span class="invalid">格式无效 <b>${data.invalid.length}</b></span>`:''}</div>${missing.length?`<h2>不存在的邮箱</h2><pre>${missing.map(escapeHtml).join('\n')}</pre><div class="actions" style="padding:16px 0 0"><button id="download" class="primary" type="button">下载 missing-emails.txt</button></div>`:''}</div>`; result.classList.add('show');
+        document.querySelector('#download')?.addEventListener('click', async()=>{ const r=await fetch('/api/export',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({missing})}); const blob=await r.blob(); const url=URL.createObjectURL(blob), a=document.createElement('a'); a.href=url; a.download='missing-emails.txt'; a.click(); URL.revokeObjectURL(url); });
+      } catch(err){ result.innerHTML=`<div class="status error"><div class="status-icon">!</div><div><strong>检查失败</strong><p>${err.message}</p></div></div>`; result.classList.add('show'); } finally { check.disabled=false; check.innerHTML='检查邮箱 <span aria-hidden="true">→</span>'; }
+    });
+  </script>
+</body>
+</html>
