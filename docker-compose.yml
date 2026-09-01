@@ -9,10 +9,17 @@ services:
     env_file:
       - .env
     ports:
-      - "${HOST_PORT:-5000}:5000"
+      - "21018:5000"
+    networks:
+      - tokens_default
     healthcheck:
       test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:5000/healthz', timeout=3)"]
       interval: 30s
       timeout: 5s
       retries: 3
       start_period: 10s
+
+networks:
+  tokens_default:
+    external: true
+    name: tokens_default

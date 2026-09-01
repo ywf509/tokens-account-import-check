@@ -28,7 +28,7 @@ vim .env  # 填写真实的 MySQL 连接信息
 docker compose up -d --build
 ```
 
-访问 `http://服务器IP:${HOST_PORT:-5000}`。查看日志：
+访问 `http://服务器IP:21018`。容器会加入已存在的 Docker 网络 `tokens_default`，并将宿主机 `21018` 端口映射到容器 `5000` 端口。查看日志：
 
 ```bash
 docker compose logs -f email-checker
@@ -48,7 +48,12 @@ DB_PORT=3306
 DB_USER=数据库用户
 DB_PASSWORD=数据库密码
 DB_NAME=数据库名
-HOST_PORT=5000
 ```
 
-如果 MySQL 也运行在同一个 Compose 网络中，将 `DB_HOST` 设置为 MySQL 服务名；如果 MySQL 在宿主机上，Linux 环境通常需要将 `DB_HOST` 设置为宿主机可达地址，而不是容器内的 `127.0.0.1`。
+如果 MySQL 也运行在 `tokens_default` 网络中，将 `DB_HOST` 设置为 MySQL 服务名；如果 MySQL 在宿主机上，Linux 环境通常需要将 `DB_HOST` 设置为宿主机可达地址，而不是容器内的 `127.0.0.1`。
+
+首次部署前确认外部网络已经存在：
+
+```bash
+docker network inspect tokens_default >/dev/null || docker network create tokens_default
+```
